@@ -77,7 +77,7 @@ read_bioness <- function(file) {
     data$metadata <- as.list(towmetadata_values)
     names(data$metadata) <- towmetadata_names
 
-    netdataframe <- str_split(netdinfodata, pattern = ",")
+    netdataframe <- str_split(netinfodata, pattern = ",")
     netdataframe <- as.data.frame(netdataframe,
                                   row.names = c('net_number', 'time', 'depth', 'volume', 'temperature', 'salinity' ,'strobe'))
     names(netdataframe) <- NA
