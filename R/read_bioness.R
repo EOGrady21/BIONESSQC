@@ -17,11 +17,11 @@ read_bioness <- function(file) {
   file <- fs::path_tidy(file)
   shortname <- str_split_i(file, pattern = '/',  i = -1)
   file_type <- NULL
-  if (length(grep(shortname, pattern = '\.T\d{2}$')) > 0) {
+  if (length(grep(shortname, pattern = '\\.T\\d{2}$')) > 0) {
     file_type <- 'T'
     #message('File type .T detected!')
   }
-  if (length(grep(shortname, pattern = '\.B\d{2}$')) > 0) {
+  if (length(grep(shortname, pattern = '\\.B\\d{2}$')) > 0) {
     file_type <- 'B'
     #message('File type .B detected!')
   }
