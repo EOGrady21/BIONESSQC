@@ -17,13 +17,13 @@ read_bioness <- function(file) {
   file <- fs::path_tidy(file)
   shortname <- str_split_i(file, pattern = '/',  i = -1)
   file_type <- NULL
-  if (length(grep(shortname, pattern = 'T14')) > 0) {
+  if (length(grep(shortname, pattern = '\.T\d{2}$')) > 0) {
     file_type <- 'T'
-    #message('File type .T14 detected!')
+    #message('File type .T detected!')
   }
-  if (length(grep(shortname, pattern = 'B14')) > 0) {
+  if (length(grep(shortname, pattern = '\.B\d{2}$')) > 0) {
     file_type <- 'B'
-    #message('File type .B14 detected!')
+    #message('File type .B detected!')
   }
   if(is.null(file_type)) {
     stop('File type not recognized!')
@@ -33,7 +33,7 @@ read_bioness <- function(file) {
     stop('File type not supported! IN DEVELOPMENT')
   }
 
-  # Read T14 files
+  # Read T files
   if (file_type == 'T') {
     linedata <- readLines(file)
   # grab net header
