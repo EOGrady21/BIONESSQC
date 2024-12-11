@@ -1,0 +1,10 @@
+﻿Sample_completeness,pattern,Analysis ,Proc_code ,What_was_it 
+Zooplankton (multiple species) ,,1 ,20 ,1 
+"Calanus (multiple species), may be absent ",,2 ,20 ,1 
+"Large animals (multiple species), may be absent ",,1 ,21 ,1 and 2 for each spp 
+Total large biomass (if large animals present) ,,1 ,21 ,2 
+Small biomass (may be negative integer) ,,1 ,22 ,2 
+Total Biomass weight ,,1 ,23 ,2 
+Dry weight biomass ,,1 ,50 ,3 
+Oithona (at least one row starting with ‘Oithona’ and having a count) ,,1 ,20 ,1 
+,,,,
