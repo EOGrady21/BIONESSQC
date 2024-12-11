@@ -25,7 +25,7 @@ plankton_data_check <- function(data) {
                         "SPLIT" = 'numeric',
                         "ALIQUOT" = 'numeric',
                         "Split_fraction" = 'numeric',
-                        "TAXA" = 'chr',
+                        "TAXA" = 'character',
                         "NCODE" = 'numeric',
                         "STAGE" = 'numeric',
                         "SEX" = 'numeric',
@@ -36,7 +36,7 @@ plankton_data_check <- function(data) {
   for (i in 1:length(plankton_headers)) {
     check <- grep(pattern = names(plankton_headers)[i],x =  names(data))
     if(length(check) == 0){
-      warning("Data column missing! [", plankton_headers[i], "]")
+      warning("Data column missing! [", names(plankton_headers)[i], "]")
     }
 
   # check numeric vs character columns
