@@ -1,0 +1,22 @@
+---
+title: "BIONESS_Quality_Control_Template"
+author: "Emily O'Grady"
+date: "2024-12-11"
+output: html_document
+---
+This is a template for running quality control checks on the BIONESS data. 
+
+This workflow is meant to confirm the quality of BIONESS plankton data before
+loading to BioChem. The checks confirm the formatting of the data as well as
+some common sense checks on the content of the taxonomic data. These checks were
+developed in close coordination with Rebecca Milne, plankton taxonomist and 
+subject matter expert.
+
+
+The first step is to confirm that the data is properly formatted for loading. 
+We check the headers against standard values and ensure that each columns 
+has the expected data type (numeric or character value). 
+
+The next step involves more detailed checks on the data based on standard 
+expectations. The tests are each detailed in the function documentation. 
+
