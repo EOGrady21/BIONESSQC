@@ -47,8 +47,12 @@ metafiles <- files[grep(pattern = "*_Elog.xlsx", x = files)]
 for (i in 1:length(datafiles)) {
   
   # read in data
-  data <- read_excel(datafiles[i], sheet = 1)
-  metadata <- read_excel(metafiles[i], sheet = 1)
+  data <- read_xlsx(datafiles[i], sheet = 1)
+  if (length(metafiles) > 0){
+    metadata <- read_excel(metafiles[i], sheet = 1)
+  } else {
+    metadata <- NULL
+  }
   
 # open output document named with mission name from data file
 mission <- str_split_i(str_split_i(datafiles[i], "\\\\", -1), "_", 1)
@@ -59,12 +63,18 @@ sink(file.path(here('QC_output'), output_file))
 cat(paste0("Quality Control Report for ", mission, "\n"))
 cat(paste0("Date: ", Sys.Date(), '   ', format(Sys.time(), '%H:%M:%S'), "\n\n"))
 cat("---------------------------------------------\n\n")
+
+if (is.null(metadata)) {
+  cat("No metadata file found.\n\n")
+} 
  
 
 # run QC tests on each file
 plankton_data_check(data)
 
-plankton_metadata_check(data, metadata)
+if (!is.null(metadata)) {
+  plankton_metadata_check(data, metadata)
+}
 
 plankton_completeness_check(data)
 
