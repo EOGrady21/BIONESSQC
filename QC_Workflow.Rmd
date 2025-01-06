@@ -20,8 +20,8 @@ has the expected data type (numeric or character value).
 The next step involves more detailed checks on the data based on standard 
 expectations. The tests are each detailed in the function documentation. 
 
-This document will run through all of the Qc tests in 'quality_control.R' for 
-each file selected by the user. The output will be recorded in a text file named
+This document will run through all of the QC tests in 'quality_control.R' for 
+each data file selected by the user. The output will be recorded in a text file named
 based on the mission with the date and time of the run. 
 
 ```{r setup, include=FALSE}

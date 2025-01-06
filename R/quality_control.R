@@ -6,6 +6,10 @@ library(here)
 # These functions check the BIONESS data to be submitted to
 # ODIS for loading to BioChem
 
+#TODO
+  # flexibility for capitalization  in weights
+
+
 # read in sample final file for development
 # data <- readxl::read_excel(path =
 #   "R:/Science/BIODataSvc/SRC/ZPlankton_DataRescue/OGrady_2024/FINAL/HUD2013004/HUD2013004_BIONESS.xlsx")
@@ -14,7 +18,16 @@ library(here)
 #   "R:/Science/BIODataSvc/SRC/ZPlankton_DataRescue/OGrady_2024/FINAL/HUD2013004/HUD2013004_InputTbl_Elog.xlsx")
 
 # Formatting checks ----
-# data formatting check
+#' Data formatting check
+#'
+#' This function checks the  formatting of the BIONESS data including column
+#' names, data types, and consistency in columns that should be copied.
+#'
+#' @param data a BIONESS dataframe
+#'
+#' @return
+#' @export
+#'
 plankton_data_check <- function(data) {
   w <- 0
   # detect file type and set some standard values and expectations
@@ -78,7 +91,20 @@ plankton_data_check <- function(data) {
 }
 
 # check metadata vs data
+#' Metadaa check
+#'
+#' This function checks the metadata (Elog file) against the BIONESS data to
+#' ensure that all events are present in both dataframes and that the date
+#' ranges match.
+#'
+#' @param data a BIONESS dataframe
+#' @param metadata an Elog dataframe
+#'
+#' @return
+#' @export
+#'
 plankton_metadata_check <- function(data, metadata) {
+
   w <- 0
   # Check that all events are present in both dataframes
   m_events <- unique(metadata$Event)
@@ -106,8 +132,18 @@ plankton_metadata_check <- function(data, metadata) {
 
 # Data Quality Checks ----
 
-# Calanus analysis check
+#
+#' Calanus analysis check
+#'
+#' This function checks that all Calanus species are labelled as analysis 2 and
+#' have the same split fraction for each sample id.
+#'
+#' @param data a BIONESS dataframe
+#'
+#' @return
+#' @export
 plankton_calanalysis_check <- function(data) {
+
   w <- 0
 
   # Check that all calanus species are labelled anlaysis 2 and have the same split fraction for each sample id
@@ -136,7 +172,20 @@ plankton_calanalysis_check <- function(data) {
 
 
 # Weight checks
+#' Check weights
+#'
+#' This function checks the weight columns in the BIONESS data to ensure that
+#' the dry weight is less than half of the small wet weight for a unique sample
+#' ID and that the total weight is consistent with the sum of the small and large
+#' biomass.
+#'
+#' @param data a BIONESS dataframe
+#'
+#' @return
+#' @export
+#'
 plankton_weight_check <- function(data) {
+
   w <- 0
   # Dry weight should always be less than half of the small wet weight for a unique sample ID
   # Total weight
@@ -146,16 +195,17 @@ plankton_weight_check <- function(data) {
 
   # Dry weight should always be less than half of the small wet weight for a unique sample ID
   for (si in unique(wt_data$SAMPLEID)) {
-    small_weight <- wt_data[wt_data$SAMPLEID == si & wt_data$TAXA == "Small_biomass", "DATA_VALUE"]
-    dry_weight <- wt_data[wt_data$SAMPLEID == si & wt_data$TAXA == "dry_weight", "DATA_VALUE"]
+    small_weight <- wt_data[wt_data$SAMPLEID == si & tolower(wt_data$TAXA) == "small_biomass", "DATA_VALUE"]
+    dry_weight <- wt_data[wt_data$SAMPLEID == si & tolower(wt_data$TAXA) == "dry_weight", "DATA_VALUE"]
     if (dry_weight > 0.5 * small_weight) {
       cat("Dry weight is greater than half of small wet weight for sample ID ", si, '\n')
       w <- w+1
     }
   }
 
-  large_weight <- wt_data[wt_data$SAMPLEID == si & wt_data$TAXA == "Large_biomass", "DATA_VALUE"]
-  totwt <- wt_data[wt_data$SAMPLEID == si & wt_data$TAXA == "Totwt", "DATA_VALUE"]
+  large_weight <- wt_data[wt_data$SAMPLEID == si & tolower(wt_data$TAXA) == "large_biomass", "DATA_VALUE"]
+  if (nrow(large_weight) == 0) {large_weight = 0}
+  totwt <- wt_data[wt_data$SAMPLEID == si & tolower(wt_data$TAXA) == "totwt", "DATA_VALUE"]
 
   if (small_weight < 0) {
     if (totwt != small_weight) {
@@ -174,8 +224,21 @@ plankton_weight_check <- function(data) {
 
 }
 
-# Data completeness
+
+#' Data completeness check
+#'
+#' This function checks the BIONESS data for completeness including the presence
+#' of multiple zooplankton species in analysis 1, the presence of small biomass,
+#' total weight, and dry weight, and the presence of Oithona species.
+#'
+#'
+#' @param data
+#'
+#' @return
+#' @export
+#'
 plankton_completeness_check <- function(data) {
+
   w <- 0
 
   # Check for multiple zooplankton species in analysis 1
@@ -185,12 +248,12 @@ plankton_completeness_check <- function(data) {
   }
 
   #Small Biomass check
-  if (!("Small_biomass" %in% data$TAXA)) {
+  if (!("small_biomass" %in% tolower(data$TAXA))) {
     cat("Small biomass missing! \n")
     w <- w+1
   }
   # Small biomass should have analysis = "1" and proc_code = "22" and what_was_it = "2"
-  sb_data <- data[data$TAXA == "Small_biomass", ]
+  sb_data <- data[tolower(data$TAXA) == "small_biomass", ]
   if (unique(sb_data$ANALYSIS) != 1) {
     cat("Small biomass has miscoded analysis values! \n")
     w <- w+1
@@ -205,12 +268,12 @@ plankton_completeness_check <- function(data) {
   }
 
   # Total weight checks
-  if (!("Totwt" %in% data$TAXA)) {
+  if (!("totwt" %in% tolower(data$TAXA))) {
     cat("Total weight missing! \n")
     w <- w+1
   }
   # Totwt should have analysis = '1', proc_code = 23, and what_was_it = 2
-  tw_data <- data[data$TAXA == "Totwt", ]
+  tw_data <- data[tolower(data$TAXA) == "totwt", ]
   if (unique(tw_data$ANALYSIS) != 1) {
     cat("Total weight has miscoded analysis values! \n")
     w <- w+1
@@ -225,12 +288,12 @@ plankton_completeness_check <- function(data) {
   }
 
   # dry weight checks
-  if (!("dry_weight" %in% data$TAXA)) {
+  if (!("dry_weight" %in% tolower(data$TAXA))) {
     cat("Dry weight missing! \n")
     w <- w+1
   }
   # dry weight should have analysis = 1, proc_code = 50, and what_was_it = 3
-  dw_data <- data[data$TAXA == "dry_weight", ]
+  dw_data <- data[tolower(data$TAXA) == "dry_weight", ]
   if (unique(dw_data$ANALYSIS) != 1) {
     cat("Dry weight has miscoded analysis values! \n")
     w <- w+1
@@ -256,18 +319,31 @@ plankton_completeness_check <- function(data) {
 
 }
 
-# Split and split fraction
+
+#' Split Fraction Test
+#'
+#' This function checks the split fraction for the BIONESS data to ensure that
+#' wet weights have a split fraction of 1, dry weights have a split fraction of
+#' 0.5, and that Calanus species have a single unique split fraction for each
+#' sample ID.
+#'
+#' @param data a BIONESS dataframe
+#'
+#' @return
+#' @export
+#'
 plankton_split_check <- function(data) {
+
   w <- 0
   # split for wet weight and large bugs is always 0, split fraction is always 1
 
-  if (any(data[data$TAXA %in% c('Small_biomass', 'Large_biomass'), 'SPLIT_FRACTION'] != 1)) {
+  if (any(data[tolower(data$TAXA) %in% c('small_biomass', 'large_biomass'), 'SPLIT_FRACTION'] != 1)) {
     cat("Wet weights do not have split fraction of 1! \n")
     w <- w+1
   }
 
   # split for dry weight is always 1 and dry weight split fraction is always 0.5
-  if (any(data[data$TAXA == 'dry_weight', 'SPLIT_FRACTION'] != 0.5)) {
+  if (any(data[tolower(data$TAXA) == 'dry_weight', 'SPLIT_FRACTION'] != 0.5)) {
     cat("Dry weights do not have split fraction of 0.5! \n")
     w <- w+1
   }
@@ -286,8 +362,20 @@ plankton_split_check <- function(data) {
   }
 }
 
-# Large animal matching
+#' Large animal check
+#'
+#' This function checks the large animal counts and weights to ensure that there
+#' is only one count per sample ID and that the counts are integers. It also
+#' checks that there is only one weight per sample ID and that the weights are
+#' recorded to 4 decimal places.
+#'
+#' @param data a BIONESS dataframe
+#'
+#' @return
+#' @export
+#'
 plankton_lganimal_check <- function(data) {
+
   w <- 0
   # large animal counts should match large animal weights
 
@@ -326,8 +414,20 @@ plankton_lganimal_check <- function(data) {
 
 
 
-# Numeric Precision
+
+#' Numeric Precision Check
+#'
+#' This function checks the numeric precision of the BIONESS data to ensure that
+#' all counts are integers and all weights are recorded to 4 decimal places.
+#'
+#'
+#' @param data a BIONESS dataframe
+#'
+#' @return
+#' @export
+#'
 plankton_numeric_check <- function(data) {
+
   # All counts should be integers and all weights are recorded to 4 decimal places (note that excel deletes trailing zeros)
   w <- 0
   if (any(data$WHAT_WAS_IT == 1 & data$DATA_VALUE %% 1 != 0)) {
