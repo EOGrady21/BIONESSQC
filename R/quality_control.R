@@ -193,6 +193,12 @@ plankton_weight_check <- function(data) {
 
   wt_data <- data[data$NCODE == 1608, ]
 
+  # check that all weight data is properly named (small_biomass, large_biomass, dry_weight, totwt)
+  if (!all(tolower(wt_data$TAXA) %in% c("small_biomass", "large_biomass", "dry_weight", "totwt"))) {
+    cat("Weight data is not properly named! \n")
+    w <- w+1
+  }
+
   # Dry weight should always be less than half of the small wet weight for a unique sample ID
   for (si in unique(wt_data$SAMPLEID)) {
     small_weight <- wt_data[wt_data$SAMPLEID == si & tolower(wt_data$TAXA) == "small_biomass", "DATA_VALUE"]
