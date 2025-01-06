@@ -1,0 +1,17 @@
+Quality Control Report for HUD2013004
+Date: 2025-01-06   10:58:59
+
+---------------------------------------------
+
+Data type for  SAMPLEID  is,  character  instead of expected,  numeric 
+Data type for  START_DEPTH  is,  character  instead of expected,  numeric 
+Data type for  END_DEPTH  is,  character  instead of expected,  numeric 
+Data type for  COMMENT  is,  logical  instead of expected,  character 
+Metadata check passed 
+Data completeness check passed 
+Calanus analysis check passed 
+Large animal check passed 
+Numeric Precision check passed 
+Split fraction check passed 
+Weight check passed 
+All checks complete.

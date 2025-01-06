@@ -20,3 +20,69 @@ has the expected data type (numeric or character value).
 The next step involves more detailed checks on the data based on standard 
 expectations. The tests are each detailed in the function documentation. 
 
+This document will run through all of the Qc tests in 'quality_control.R' for 
+each file selected by the user. The output will be recorded in a text file named
+based on the mission with the date and time of the run. 
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(readxl)
+library(here)
+source(here('R/quality_control.R'))
+dir.create(here('QC_output'), showWarnings = FALSE)
+```
+
+```{r, include=FALSE}
+
+# choose files to be QC'd
+files <- choose.files(default = 'R:/Science/BIODataSvc/SRC/ZPlankton_DataRescue/OGrady_2024/FINAL', multi = TRUE)
+datafiles <- files[grep(pattern = "*_BIONESS.xlsx", x = files)]
+metafiles <- files[grep(pattern = "*_Elog.xlsx", x = files)]
+
+```
+
+
+
+```{r}
+for (i in 1:length(datafiles)) {
+  
+  # read in data
+  data <- read_excel(datafiles[i], sheet = 1)
+  metadata <- read_excel(metafiles[i], sheet = 1)
+  
+# open output document named with mission name from data file
+mission <- str_split_i(str_split_i(datafiles[i], "\\\\", -1), "_", 1)
+output_file <- paste0(mission, "_QC_", Sys.Date(), ".txt")
+sink(file.path(here('QC_output'), output_file))
+
+# write header
+cat(paste0("Quality Control Report for ", mission, "\n"))
+cat(paste0("Date: ", Sys.Date(), '   ', format(Sys.time(), '%H:%M:%S'), "\n\n"))
+cat("---------------------------------------------\n\n")
+ 
+
+# run QC tests on each file
+plankton_data_check(data)
+
+plankton_metadata_check(data, metadata)
+
+plankton_completeness_check(data)
+
+plankton_calanalysis_check(data)
+
+plankton_lganimal_check(data)
+
+plankton_numeric_check(data)
+
+plankton_split_check(data)
+
+plankton_weight_check(data)
+
+cat("All checks complete.\n")
+
+sink()
+
+}
+```
+
+
