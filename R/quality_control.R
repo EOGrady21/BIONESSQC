@@ -203,7 +203,10 @@ plankton_weight_check <- function(data) {
   for (si in unique(wt_data$SAMPLEID)) {
     small_weight <- wt_data[wt_data$SAMPLEID == si & tolower(wt_data$TAXA) == "small_biomass", "DATA_VALUE"]
     dry_weight <- wt_data[wt_data$SAMPLEID == si & tolower(wt_data$TAXA) == "dry_weight", "DATA_VALUE"]
-    if (dry_weight > 0.5 * small_weight) {
+    # if dry weight is negative integer skip test
+    if (small_weight <0 & small_weight %% 1 == 0) {
+      #skip test
+    } else if (dry_weight > 0.5 * small_weight) {
       cat("Dry weight is greater than half of small wet weight for sample ID ", si, '\n')
       w <- w+1
     }
@@ -394,8 +397,18 @@ plankton_lganimal_check <- function(data) {
 
     # check counts
     if (length(unique(count$SAMPLEID)) != nrow(count)) {
-      cat("Large taxa ", t, " has more than one count per SAMPLEID! \n")
-      w <- w+1
+      # if stage and sex are unique, then the count should be unique
+      for (sampleid in unique(count$SAMPLEID)) {
+        stage_sex <- unique(paste0(
+          count$STAGE[count$SAMPLEID == sampleid],
+          "_",
+          count$SEX[count$SAMPLEID == sampleid]))
+        if (length(stage_sex) != nrow(count[count$SAMPLEID == sampleid, ])) {
+
+        cat("Large taxa ", t, " has more than one count per SAMPLEID! [", sampleid, "] \n")
+        w <- w+1
+        }
+      }
     }
     if (any(count$DATA_VALUE %% 1 != 0)) {
       cat("Large taxa ", t, " has non-integer count! \n")
@@ -404,8 +417,17 @@ plankton_lganimal_check <- function(data) {
 
     # check weights
     if (length(unique(weight$SAMPLEID)) != nrow(weight)) {
-      cat("Large taxa ", t, " has more than one weight per SAMPLEID! \n")
-      w <- w+1
+      for (sampleid in unique(weight$SAMPLEID)) {
+        stage_sex <- unique(paste0(
+          weight$STAGE[weight$SAMPLEID == sampleid],
+          "_",
+          weight$SEX[weight$SAMPLEID == sampleid]))
+        if (length(stage_sex) != nrow(count[weight$SAMPLEID == sampleid, ])) {
+
+        cat("Large taxa ", t, " has more than one weight per SAMPLEID! [", sampleid, "] \n")
+        w <- w+1
+        }
+      }
     }
     if (any(weight$DATA_VALUE %% 1 == 0)) {
       cat("Large taxa ", t, " has integer weight! \n")
