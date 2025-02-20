@@ -19,13 +19,11 @@ read_bioness <- function(file) {
   file_type <- NULL
   if (length(grep(shortname, pattern = '\\.T\\d{2}$')) > 0) {
     file_type <- 'T'
-    #message('File type .T detected!')
   }
   if (length(grep(shortname, pattern = '\\.B\\d{2}$')) > 0) {
     file_type <- 'B'
-    #message('File type .B detected!')
   }
-  if(is.null(file_type)) {
+  if (is.null(file_type)) {
     stop('File type not recognized!')
   }
 
@@ -36,11 +34,13 @@ read_bioness <- function(file) {
   # Read T files
   if (file_type == 'T') {
     linedata <- readLines(file)
-  # grab net header
+
+    # grab net header
     netinfohead <- which(linedata == 'Net Information')
     if (length(netinfohead) == 0 | length(netinfohead) > 1) {
       stop('Net Information header not properly detected!')
     }
+
     # grab tow metadata header
     towmetahead <- which(linedata == 'Tow Configuration Information')
     if (length(towmetahead) == 0 | length(towmetahead) > 1) {
@@ -67,8 +67,7 @@ read_bioness <- function(file) {
     }
 
     # format into bioness object
-
-    data <- list('metadata'= list(), 'data' = data.frame())
+    data <- list('metadata' = list(), 'data' = data.frame())
     class(data) <- 'BIONESS'
 
     towmetadata_names <- str_trim(str_split_i(towmetadata, pattern = '=', i = 1), side = 'both')
@@ -77,15 +76,25 @@ read_bioness <- function(file) {
     data$metadata <- as.list(towmetadata_values)
     names(data$metadata) <- towmetadata_names
 
-    netdataframe <- str_split(netinfodata, pattern = ",")
-    netdataframe <- as.data.frame(netdataframe,
-                                  row.names = c('net_number', 'time', 'depth', 'volume', 'temperature', 'salinity' ,'strobe'))
-    names(netdataframe) <- NA
-
-    data$data <- data.frame(t(netdataframe))
-
-    return(data)
+    if (length(netinfodata) == 0) {
+      # No net information found, return empty dataframe with NA values
+      data$data <- data.frame(
+        net_number = NA,
+        time = NA,
+        depth = NA,
+        volume = NA,
+        temperature = NA,
+        salinity = NA,
+        strobe = NA
+      )
+    } else {
+      netdataframe <- str_split(netinfodata, pattern = ",")
+      netdataframe <- as.data.frame(netdataframe,
+                                    row.names = c('net_number', 'time', 'depth', 'volume', 'temperature', 'salinity' ,'strobe'))
+      names(netdataframe) <- NA
+      data$data <- data.frame(t(netdataframe))
     }
 
-
+    return(data)
+  }
 }
