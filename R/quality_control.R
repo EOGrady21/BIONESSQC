@@ -336,7 +336,7 @@ plankton_completeness_check <- function(data) {
   }
 
   # Oithona check
-  if (!any(grepl("^Oithona", data$TAXA, ignore.case = TRUE))) {
+  if (!any(grepl("^Oith", data$TAXA, ignore.case = TRUE))) {
     cat("No Oithona species detected! \n")
     w <- w + 1
   }
