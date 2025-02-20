@@ -52,6 +52,7 @@ plankton_data_check <- function(data) {
                         "DATA_VALUE" = "numeric",
                         "PROC_CODE" = "numeric",
                         "WHAT_WAS_IT" = "numeric",
+                        "DATA_QC_CODE" = "numeric",
                         "COMMENT" = "character")
   for (i in seq_along(plankton_headers)) {
     check <- grep(pattern = names(plankton_headers)[i], x = names(data))
@@ -85,6 +86,13 @@ plankton_data_check <- function(data) {
       }
     }
   }
+
+  # check valid flag values
+  if (any(data$DATA_QC_CODE < 0 | data$DATA_QC_CODE > 9)) {
+    cat("Invalid data quality flag values! \n")
+    w <- w+1
+  }
+
   if (w == 0) {
     cat("Data formatting check passed \n")
   }
@@ -203,6 +211,11 @@ plankton_weight_check <- function(data) {
   for (si in unique(wt_data$SAMPLEID)) {
     small_weight <- wt_data[wt_data$SAMPLEID == si & tolower(wt_data$TAXA) == "small_biomass", "DATA_VALUE"]
     dry_weight <- wt_data[wt_data$SAMPLEID == si & tolower(wt_data$TAXA) == "dry_weight", "DATA_VALUE"]
+    if (nrow(small_weight) == 0) { # there should always be a small biomass and total weight
+      cat("No small weight for sample ID ", si, '\n')
+      w <- w+1
+
+    } else {
     # if dry weight is negative integer skip test
     if (small_weight <0 & small_weight %% 1 == 0) {
       #skip test
@@ -210,11 +223,17 @@ plankton_weight_check <- function(data) {
       cat("Dry weight is greater than half of small wet weight for sample ID ", si, '\n')
       w <- w+1
     }
+    }
   }
 
   large_weight <- wt_data[wt_data$SAMPLEID == si & tolower(wt_data$TAXA) == "large_biomass", "DATA_VALUE"]
   if (nrow(large_weight) == 0) {large_weight = 0}
   totwt <- wt_data[wt_data$SAMPLEID == si & tolower(wt_data$TAXA) == "totwt", "DATA_VALUE"]
+  if (nrow(totwt) == 0) {
+    cat("No total weight for sample ID ", si, "\n")
+    w <- w+1
+
+  } else {
 
   if (small_weight < 0) {
     if (totwt != small_weight) {
@@ -226,6 +245,7 @@ plankton_weight_check <- function(data) {
       cat("Total weight does not equal small biomass + large biomass for sample ID ", si, '\n')
       w <- w+1
     }
+  }
   }
   if (w == 0) {
     cat("Weight check passed \n")
