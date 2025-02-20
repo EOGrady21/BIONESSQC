@@ -247,87 +247,84 @@ plankton_weight_check <- function(data) {
 #' @export
 #'
 plankton_completeness_check <- function(data) {
-
   w <- 0
 
   # Check for multiple zooplankton species in analysis 1
   if (length(unique(data$TAXA[data$ANALYSIS == 1])) < 3) {
     cat("Less than 3 species detected in analysis 1! \n")
-    w <- w+1
+    w <- w + 1
   }
 
-  #Small Biomass check
+  # Small Biomass check
   if (!("small_biomass" %in% tolower(data$TAXA))) {
     cat("Small biomass missing! \n")
-    w <- w+1
+    w <- w + 1
   }
   # Small biomass should have analysis = "1" and proc_code = "22" and what_was_it = "2"
   sb_data <- data[tolower(data$TAXA) == "small_biomass", ]
-  if (unique(sb_data$ANALYSIS) != 1) {
+  if (any(sb_data$ANALYSIS != 1)) {
     cat("Small biomass has miscoded analysis values! \n")
-    w <- w+1
+    w <- w + 1
   }
-  if (unique(sb_data$PROC_CODE) != 22) {
+  if (any(sb_data$PROC_CODE != 22)) {
     cat("Small biomass has miscoded proc_code values! \n")
-    w <- w+1
+    w <- w + 1
   }
-  if (unique(sb_data$WHAT_WAS_IT) != 2) {
+  if (any(sb_data$WHAT_WAS_IT != 2)) {
     cat("Small biomass has miscoded what_was_it values! \n")
-    w <- w+1
+    w <- w + 1
   }
 
   # Total weight checks
   if (!("totwt" %in% tolower(data$TAXA))) {
     cat("Total weight missing! \n")
-    w <- w+1
+    w <- w + 1
   }
   # Totwt should have analysis = '1', proc_code = 23, and what_was_it = 2
   tw_data <- data[tolower(data$TAXA) == "totwt", ]
-  if (unique(tw_data$ANALYSIS) != 1) {
+  if (any(tw_data$ANALYSIS != 1)) {
     cat("Total weight has miscoded analysis values! \n")
-    w <- w+1
+    w <- w + 1
   }
-  if (unique(tw_data$PROC_CODE) != 23) {
+  if (any(tw_data$PROC_CODE != 23)) {
     cat("Total weight has miscoded proc_code values! \n")
-    w <- w+1
+    w <- w + 1
   }
-  if (unique(tw_data$WHAT_WAS_IT) != 2) {
-    cat("Total weight has different what_was_it values! \n")
-    w <- w+1
+  if (any(tw_data$WHAT_WAS_IT != 2)) {
+    cat("Total weight has miscoded what_was_it values! \n")
+    w <- w + 1
   }
 
-  # dry weight checks
+  # Dry weight checks
   if (!("dry_weight" %in% tolower(data$TAXA))) {
     cat("Dry weight missing! \n")
-    w <- w+1
+    w <- w + 1
   }
-  # dry weight should have analysis = 1, proc_code = 50, and what_was_it = 3
+  # Dry weight should have analysis = 1, proc_code = 50, and what_was_it = 3
   dw_data <- data[tolower(data$TAXA) == "dry_weight", ]
-  if (unique(dw_data$ANALYSIS) != 1) {
+  if (any(dw_data$ANALYSIS != 1)) {
     cat("Dry weight has miscoded analysis values! \n")
-    w <- w+1
+    w <- w + 1
   }
-  if (unique(dw_data$PROC_CODE) != 50) {
+  if (any(dw_data$PROC_CODE != 50)) {
     cat("Dry weight has miscoded proc_code values! \n")
-    w <- w+1
+    w <- w + 1
   }
-  if (unique(dw_data$WHAT_WAS_IT) != 3) {
+  if (any(dw_data$WHAT_WAS_IT != 3)) {
     cat("Dry weight has miscoded what_was_it values! \n")
-    w <- w+1
+    w <- w + 1
   }
 
   # Oithona check
   if (!any(grepl("^Oithona", data$TAXA, ignore.case = TRUE))) {
     cat("No Oithona species detected! \n")
-    w <- w+1
+    w <- w + 1
   }
+
   if (w == 0) {
     cat("Data completeness check passed \n")
   }
-
-
 }
-
 
 #' Split Fraction Test
 #'
