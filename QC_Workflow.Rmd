@@ -95,4 +95,31 @@ sink()
 }
 ```
 
+After these automated check were completed, flags were individually reviewed by 
+the data management team as well as subject matter experts. The final flags were
+manually inserted into the excel data in the DATA_QC_CODE column.
+
+Once the flags were added the data is finally reviewed and 1 flags are inserted
+to indicate good data where flags have not been inserted.
+
+```{r}
+
+# read in each data file
+finaldir <- 'R:/Science/BIODataSvc/SRC/ZPlankton_DataRescue/OGrady_2024/FINAL'
+alldata_fns <- list.files(finaldir, pattern = "*BIONESS.xlsx",
+                          full.names = TRUE, recursive = TRUE)
+# remove temporary file dups with pattern "~$"
+alldata_fns <- alldata_fns[!grepl("~\\$", alldata_fns)]
+
+# run final_flags()
+withr::with_dir(finaldir, {
+  sink('final_QC_output.txt')
+for (i in 1:length(alldata_fns)) {
+  data <- read_xlsx(alldata_fns[i], sheet = 1)
+  final_flags(data)
+}
+  sink()
+})
+```
+
 

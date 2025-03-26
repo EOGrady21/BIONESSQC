@@ -88,9 +88,11 @@ plankton_data_check <- function(data) {
   }
 
   # check valid flag values
-  if (any(data$DATA_QC_CODE < 0 | data$DATA_QC_CODE > 9)) {
+  if (any(!is.na(data$DATA_QC_CODE))){
+    if (any(na.omit(data$DATA_QC_CODE) < 0 | na.omit(data$DATA_QC_CODE) > 9)) {
     cat("Invalid data quality flag values! \n")
     w <- w+1
+    }
   }
 
   if (w == 0) {
