@@ -35,9 +35,9 @@ dir.create(here('QC_output'), showWarnings = FALSE)
 ```{r, include=FALSE}
 
 # choose files to be QC'd
-files <- choose.files(default = 'R:/Science/BIODataSvc/SRC/ZPlankton_DataRescue/OGrady_2024/FINAL', multi = TRUE)
+files <- choose.files(default = 'R:/Science/BIODataSvc/SRC/ZPlankton_DataRescue/OGrady_2024/raw_data/', multi = TRUE)
 datafiles <- files[grep(pattern = "*_BIONESS.xlsx", x = files)]
-metafiles <- files[grep(pattern = "*_Elog.xlsx", x = files)]
+metafiles <- files[grep(pattern = "*_Elog_2.xlsx", x = files)]
 
 ```
 
@@ -55,7 +55,7 @@ for (i in 1:length(datafiles)) {
   }
   
 # open output document named with mission name from data file
-mission <- str_split_i(str_split_i(datafiles[i], "\\\\", -1), "_", 1)
+mission <- str_split_i(str_split_i(datafiles[i], "/", -1), "_", 1)
 output_file <- paste0(mission, "_QC_", Sys.Date(), ".txt")
 sink(file.path(here('QC_output'), output_file))
 
